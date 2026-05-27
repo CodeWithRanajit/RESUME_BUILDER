@@ -1,9 +1,16 @@
+import Banner from "../components/home/Banner"
+import Feature from "../components/home/Features";
+import Hero from "../components/home/Hero";
 
 
 const Home = () => {
   return (
-    <div>Home</div>
+    <>
+      <Banner />
+      <Hero />
+      <Feature/>
+    </>
   )
 }
 
-export default Home
+export default Home;
