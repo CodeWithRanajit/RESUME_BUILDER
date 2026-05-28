@@ -4,7 +4,7 @@ import Dashboard from "./Pages/Dashboard";
 import ResumeBuilder from "./Pages/ResumeBuilder";
 import Preview from "./Pages/Preview";
 import Login from "./Pages/Login";
-import Home from "./pages/Home";
+import Home from "./Pages/Home";
 import Pricing from "./pages/Pricing";
 const App = () => {
   return (
