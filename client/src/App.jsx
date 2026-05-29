@@ -3,9 +3,10 @@ import Layout from "./Pages/Layout";
 import Dashboard from "./Pages/Dashboard";
 import ResumeBuilder from "./Pages/ResumeBuilder";
 import Preview from "./Pages/Preview";
-import Login from "./Pages/Login";
-import Home from "./Pages/Home";
 import Pricing from "./pages/Pricing";
+import Signup from "./pages/SignUp";
+import Login from "./pages/Login";
+import Home from "./Pages/Home";
 const App = () => {
   return (
     <Routes>
@@ -17,6 +18,7 @@ const App = () => {
       <Route path="/view/:resumeId" element={<Preview />} />
       <Route path="/pricing" element={<Pricing/>}/>
       <Route path="/login" element={<Login/>} />
+      <Route path="/signup" element={<Signup/>}/>
     </Routes>
   )
 }
