@@ -25,13 +25,13 @@ const Hero = () => {
     .marquee-track {
         display: flex;
         width: max-content;
-        animation: marquee 20s linear infinite;
+        animation: marquee 35s linear infinite;
         will-change: transform;
     }
 
-    .marquee-track:hover {
-        animation-play-state: paused;
-    }
+    // .marquee-track:hover {
+    //     animation-play-state: paused;
+    // }
 
     @keyframes marquee {
         from {
@@ -45,7 +45,7 @@ const Hero = () => {
 `}</style>
       <div className="min-h-screen pb-17">
         {/* Navbar */}
-        <nav className="z-50 flex items-center justify-between w-full py-4 px-3 md:px-16 lg:px-24 xl:px-40 text-sm">
+        <nav className="z-50 flex items-center justify-between w-full py-4 px-3 md:px-16 sm:px-8 lg:px-24 xl:px-40 text-sm">
           <Link to="#">
             <img src={logo} alt="logo" className="w-[150px] h-[30px]" />
           </Link>
@@ -279,9 +279,9 @@ const Hero = () => {
             </Link>
           </div>
 
-          <p className="py-6 text-slate-600 mt-14">
-            Trusting by leading brands, including
-          </p>
+          <h3 className="py-6 text-slate-600 mt-13 text-base text-center font-medium">
+            Trusting by leading brands, including —
+          </h3>
 
           <div className="marquee max-w-5xl mx-auto select-none">
             {/* Left Fade */}

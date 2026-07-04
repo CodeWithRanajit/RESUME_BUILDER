@@ -80,7 +80,7 @@ const Features = () => {
   return (
     <>
       <div className="flex flex-col items-center ">
-        <div className="w-fit gap-2 flex items-center text-sm text-green-800 bg-green-400/10 rounded-full px-6 py-2">
+        <div className="w-fit gap-2 flex items-center text-sm text-green-800 bg-green-400/10 rounded-full px-6 py-1">
           <Zap width={15} />
           <span>Simple Process</span>
         </div>
