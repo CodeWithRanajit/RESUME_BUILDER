@@ -7,12 +7,14 @@ import Pricing from "./pages/Pricing";
 import Signup from "./pages/SignUp";
 import Login from "./pages/Login";
 import Home from "./Pages/Home";
+import NotFound from "./pages/NotFound";
 const App = () => {
   return (
     <Routes>
-      <Route path="/" element={<Home/>} />
+      <Route path="/" element={<Home />} />
+      <Route path="*" element={<NotFound/>}/>
       <Route path="app" element={<Layout/>} >
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route index element={<Dashboard />} />
         <Route path="builder/:resumeId" element={<ResumeBuilder/>} />
       </Route>
       <Route path="/view/:resumeId" element={<Preview />} />
