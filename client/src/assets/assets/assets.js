@@ -4,18 +4,19 @@ export const dummyResumeData = [
     {
         // ----------------------------------------------------- Resume 1 ------------------------------------------------------
         personal_info: {
-            full_name: "Alex Smith",
-            email: "alex@example.com",
-            phone: "0 123456789",
+            full_name: "Ranajit Chattaraj",
+            email: "ranajitchattraj@gmail.com",
+            phone: "+91 8967150279",
             location: "NY, USA",
             linkedin: "https://www.linkedin.com",
+            github: "https://github.com",
             website: "https://www.example.com",
             profession: "Full Stack Developer",
             image: dummy_profile
         },
         _id: "68d2a31a1c4dd38875bb037e",
         userId: "68c180acdf1775dfd02c6d87",
-        title: "Alex's Resume",
+        title: "Ranajit's Resume",
         public: true,
         professional_summary: "Highly analytical Data Analyst with 6 years of experience transforming complex datasets into actionable insights using SQL, Python, and advanced visualization tools. ",
         skills: ["JavaScript", "React JS", "Full Stack Development", "Git", "GitHub", "NextJS", "Express", "NodeJS", "TypeScript"],
@@ -92,6 +93,7 @@ export const dummyResumeData = [
             phone: "0 987654321",
             location: "San Francisco, CA, USA",
             linkedin: "https://www.linkedin.com/in/jordanlee",
+            github: "https://github.com",
             website: "https://www.jordanlee.dev",
             profession: "Frontend Engineer",
             image: dummy_profile
@@ -167,6 +169,7 @@ export const dummyResumeData = [
             phone: "0 1122334455",
             location: "Austin, TX, USA",
             linkedin: "https://www.linkedin.com/in/rileymorgan",
+            github: "https://github.com",
             website: "https://www.rileym.dev",
             profession: "Backend Developer",
             image: dummy_profile
