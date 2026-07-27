@@ -43,7 +43,7 @@ const Signup = () => {
             <input
               type="text"
               placeholder="Full name"
-              className="bg-transparent text-gray-500/80 placeholder-gray-500/80 outline-none text-sm w-full h-full"
+              className="bg-transparent text-gray-500/80 placeholder-gray-500/80 text-sm w-full h-full"
               required
             />
           </div>
@@ -69,6 +69,7 @@ const Signup = () => {
               className="bg-transparent text-gray-500/80 placeholder-gray-500/80 outline-none text-sm w-full h-full"
               required
             />
+            
           </div>
 
           <div className="flex items-center mt-6 w-full bg-transparent border border-gray-300/60 h-12 rounded-full overflow-hidden pl-6 gap-2">
