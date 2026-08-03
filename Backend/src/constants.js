@@ -7,4 +7,6 @@ export const DB_NAME = "resume_Craft";
 
 export const SALT_ROUND = 12;
 
-export const EMAIL_VERIFY_OTP_EXPIRY_MINUTES = 15;
+export const EMAIL_VERIFY_OTP_EXPIRY_MINUTES = 15;    // 15 means reffer to 15min
+
+export const RESET_PASSWORD_OTP_EXPIRY_MINUTES = 15;
