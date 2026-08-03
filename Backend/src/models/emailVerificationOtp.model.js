@@ -57,14 +57,14 @@ emailVerificationOtpSchema.pre("save", async function (next) {
 
 //compare otp
 emailVerificationOtpSchema.methods.isEmailVerifyOtpCorrect = async function (
-  otp,
+  otp
 ) {
   return await bcrypt.compare(otp, this.otp);
 };
 
 // expiry check
 emailVerificationOtpSchema.methods.isEmailVerificationOtpExpired = function () {
-  return this.expiresAt < new Date();
+  return (this.expiresAt < new Date());
 };
 
 const emailVerificationModel = mongoose.model(

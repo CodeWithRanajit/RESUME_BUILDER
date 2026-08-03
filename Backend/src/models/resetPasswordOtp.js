@@ -1,4 +1,6 @@
 import mongoose, { Schema } from "mongoose";
+import { RESET_PASSWORD_OTP_EXPIRY_MINUTES, SALT_ROUND } from "../constants.js";
+import bcrypt from "bcryptjs";
 
 const passwordResetOtpSchema = new Schema({
     user: {
@@ -20,11 +22,39 @@ const passwordResetOtpSchema = new Schema({
     },
     expiresAt: {
         type: Date,
-        required:true
+        required: true,
+        default:()=> new Date(Date.now() + RESET_PASSWORD_OTP_EXPIRY_MINUTES * 60 * 1000)
     },
 }, { timestamps: true });
 
-passwordResetOtpSchema.index({expiresAt:1}, {expireAfterSeconds:0});
+passwordResetOtpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+// generate otp
+passwordResetOtpSchema.static.generateOtpForResetPassword = function () {
+    return Math.floor(100000 + Math.random() * 999999).toString();
+};
+
+//store the hash otp into the db
+passwordResetOtpSchema.pre("save", async function (next) {
+    if (!this.isModified("otp")) return next();
+    try {
+        this.otp = await bcrypt.hash(this.otp, SALT_ROUND);
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
+
+// compare the otp
+passwordResetOtpSchema.methods.isResetPasswordOtpCorrect = async function (otp) {
+    return await bcrypt.compare(otp, this.otp);
+}
+
+// check the otp expier or not
+passwordResetOtpSchema.methods.isResetPasswordOtpExpired = function () {
+    return (new Date() > this.expiresAt);
+}
+
 
 const passwordResetModel = mongoose.model("PasswordResetOtp", passwordResetOtpSchema);
 export default passwordResetModel;
