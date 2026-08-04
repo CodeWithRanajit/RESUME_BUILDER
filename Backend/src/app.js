@@ -45,4 +45,7 @@ app.get("/", (req, res) => {
 });
 
 
+
+// import all routes
+
 export default app;
