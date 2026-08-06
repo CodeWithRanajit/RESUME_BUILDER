@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import apiLimit from "./middlewares/rateLimiter.js";
 
+
 const app = express();
 
 
@@ -47,5 +48,17 @@ app.get("/", (req, res) => {
 
 
 // import all routes
+import healthcheckRouter from "./routes/healthcheck.routes.js";
+import errorHandler from "./middlewares/errorHandler.js";
+import userRouter from "./routes/user.routes.js";
+
+// route declearation
+app.use("/api/v1/healthcheck", healthcheckRouter);
+app.use("/api/v1/users", userRouter);
+
+
+
+//error handler
+app.use(errorHandler);
 
 export default app;
