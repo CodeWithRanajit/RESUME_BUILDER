@@ -10,7 +10,7 @@ const userSchema = new Schema(
       required: [true, "Name is required"],
       trim: true,
       minlength: [3, "Name must be at least 3 characters long"],
-      maxlength: [50, "Name cannot exceed 50 characters"],
+      maxlength: [60, "Name cannot exceed 60 characters"],
     },
     email: {
       type: String,
@@ -32,6 +32,7 @@ const userSchema = new Schema(
     isEmailVerified: {
       type: Boolean,
       default: false,
+      required:true
     },
     emailVerifiedAt: {
       type: Date,
@@ -50,14 +51,9 @@ const userSchema = new Schema(
 );
 
 // hash password
-userSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next();
-    try {
+userSchema.pre("save", async function () {
+    if (!this.isModified("password")) return;
         this.password = await bcrypt.hash(this.password, SALT_ROUND);
-        next();
-    } catch (error) {
-        next(error);
-    }
 });
 
 //compare password
@@ -85,5 +81,5 @@ userSchema.methods.generateRefreshToken = function () {
   });
 };
 
-const User = mongoose.model("User", userSchema);
-export default User;
+export const User = mongoose.model("User", userSchema);
+

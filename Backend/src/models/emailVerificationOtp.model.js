@@ -4,7 +4,7 @@ import { EMAIL_VERIFY_OTP_EXPIRY_MINUTES, SALT_ROUND } from "../constants.js";
 
 const emailVerificationOtpSchema = new Schema(
   {
-    user: {
+    userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -39,20 +39,15 @@ emailVerificationOtpSchema.index(
 );
 
 // generate otp
-emailVerificationOtpSchema.static.generateOtpForEmailVerification =
+emailVerificationOtpSchema.statics.generateOtpForEmailVerification =
   function () {
     return Math.floor(100000 + Math.random() * 900000).toString();
   };
 
 //generate hashd otp
-emailVerificationOtpSchema.pre("save", async function (next) {
-  if (!this.isModified("otp")) return next();
-  try {
+emailVerificationOtpSchema.pre("save", async function () {
+  if (!this.isModified("otp")) return;
     this.otp = await bcrypt.hash(this.otp, SALT_ROUND);
-    next();
-  } catch (error) {
-    next(error);
-  }
 });
 
 //compare otp
@@ -67,8 +62,8 @@ emailVerificationOtpSchema.methods.isEmailVerificationOtpExpired = function () {
   return (this.expiresAt < new Date());
 };
 
-const emailVerificationModel = mongoose.model(
+export const emailVerificationModel = mongoose.model(
   "EmailVerificationOtp",
   emailVerificationOtpSchema,
 );
-export default emailVerificationModel;
+
