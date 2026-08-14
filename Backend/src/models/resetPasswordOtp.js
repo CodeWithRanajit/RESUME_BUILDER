@@ -3,7 +3,7 @@ import { RESET_PASSWORD_OTP_EXPIRY_MINUTES, SALT_ROUND } from "../constants.js";
 import bcrypt from "bcryptjs";
 
 const passwordResetOtpSchema = new Schema({
-    user: {
+    userId: {
         type: Schema.Types.ObjectId,
         ref: "User",
         required: true,
@@ -35,14 +35,9 @@ passwordResetOtpSchema.static.generateOtpForResetPassword = function () {
 };
 
 //store the hash otp into the db
-passwordResetOtpSchema.pre("save", async function (next) {
-    if (!this.isModified("otp")) return next();
-    try {
-        this.otp = await bcrypt.hash(this.otp, SALT_ROUND);
-        next();
-    } catch (error) {
-        next(error);
-    }
+passwordResetOtpSchema.pre("save", async function () {
+    if (!this.isModified("otp")) return ;
+        this.otp = await bcrypt.hash(this.otp, SALT_ROUND); 
 });
 
 // compare the otp
