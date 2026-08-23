@@ -43,7 +43,7 @@ const Signup = () => {
             <input
               type="text"
               placeholder="Full name"
-              className="bg-transparent text-gray-500/80 placeholder-gray-500/80 text-sm w-full h-full"
+              className="bg-transparent text-gray-500/80 placeholder-gray-500/80 outline-none text-sm w-full h-full"
               required
             />
           </div>
