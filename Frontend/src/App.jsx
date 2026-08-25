@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import Layout from "./Pages/Layout";
 import Dashboard from "./Pages/Dashboard";
 import ResumeBuilder from "./Pages/ResumeBuilder";
@@ -10,6 +11,8 @@ import Home from "./Pages/Home";
 import NotFound from "./pages/NotFound";
 const App = () => {
   return (
+    <>
+    <Toaster/>
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="*" element={<NotFound/>}/>
@@ -22,6 +25,7 @@ const App = () => {
       <Route path="/login" element={<Login/>} />
       <Route path="/signup" element={<Signup/>}/>
     </Routes>
+    </>
   )
 }
 
