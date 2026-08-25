@@ -1,6 +1,14 @@
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Login = () => {
+  const handleGoogleLogin=()=>{
+    toast.loading("Redirecting to Google...");
+    setTimeout(()=>{
+        window.location.href="http://localhost:8000/api/v1/auth/users/google";
+    },500);
+   
+  }
   return (
     <div className="flex h-[700px] w-full ">
       <div className="w-full flex flex-col items-center justify-center">
@@ -13,6 +21,7 @@ const Login = () => {
           <button
             type="button"
             className="w-full mt-8 bg-gray-500/10 flex items-center justify-center h-12 rounded-full"
+            onClick={handleGoogleLogin}
           >
             <img
               src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/login/googleLogo.svg"

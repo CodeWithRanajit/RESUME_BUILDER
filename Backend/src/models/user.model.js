@@ -26,13 +26,15 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: function () {
+        return this.authProvider === "local";
+      },
       minlength: [8, "Password must be at least 8 characters long"],
     },
     isEmailVerified: {
       type: Boolean,
       default: false,
-      required:true
+      required: true,
     },
     emailVerifiedAt: {
       type: Date,
@@ -46,14 +48,19 @@ const userSchema = new Schema(
       type: String,
       default: null,
     },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
   },
   { timestamps: true },
 );
 
 // hash password
 userSchema.pre("save", async function () {
-    if (!this.isModified("password")) return;
-        this.password = await bcrypt.hash(this.password, SALT_ROUND);
+  if (!this.isModified("password") || !this.password) return;
+  this.password = await bcrypt.hash(this.password, SALT_ROUND);
 });
 
 //compare password
@@ -82,4 +89,3 @@ userSchema.methods.generateRefreshToken = function () {
 };
 
 export const User = mongoose.model("User", userSchema);
-
