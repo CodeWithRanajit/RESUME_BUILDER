@@ -199,14 +199,14 @@ export const login = asyncHandler(async (req, res) => {
 
   const accessTokenOptions = {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     maxAge: 15 * 60 * 1000,
   };
 
   const refreshTokenOptions = {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   };
@@ -290,7 +290,8 @@ export const googleAuthStartHandler = asyncHandler(async (req, res) => {
   return res.redirect(url);
 });
 export const googleAuthCallbackHandler = asyncHandler(async (req, res) => {
-  const code = req.query.code;
+  try {
+    const code = req.query.code;
 
   if (!code) {
     throw new ApiError(
@@ -380,36 +381,28 @@ export const googleAuthCallbackHandler = asyncHandler(async (req, res) => {
   
   const accessTokenOptions = {
     httpOnly: true,
-    secure: true,
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
     maxAge: 15 * 60 * 1000,
   };
 
   const refreshTokenOptions = {
     httpOnly: true,
-    secure: true,
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   };
 
   return res
-    .status(200)
     .cookie("accessToken", accessToken, accessTokenOptions)
     .cookie("refreshToken", refreshToken, refreshTokenOptions)
-    .json(
-      new ApiResponse(
-        200,
-        {
-          accessToken,
-          user: {
-            id: user._id,
-            email: user.email,
-            isEmailVerified: user.isEmailVerified,
-          },
-        },
-        "Google login successful",
-      ),
+    .redirect(`${process.env.FRONTEND_URL}/auth/google/callback?status=success`);
+  } catch (error) {
+    return res.redirect(
+        `${process.env.FRONTEND_URL}/auth/google/callback?status=failed`
     );
+  }
+  
 });
 export const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken = req.cookies.refreshToken;
@@ -444,14 +437,14 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const accessTokenOptions = {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       maxAge: 15 * 60 * 1000
     };
 
     const refreshTokenOptions = {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000
     };
@@ -495,13 +488,13 @@ export const logoutUser = asyncHandler(async (req, res) => {
 
   const accessTokenOptions = {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict"
   };
 
   const refreshTokenOptions = {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict"
   };
 
@@ -515,5 +508,14 @@ export const logoutUser = asyncHandler(async (req, res) => {
         null,
         "User logged out successfully"
       )
+    );
+});
+export const getCurrentUser = asyncHandler(async (req, res) => {
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            { user: req.user },
+            "Current user fetched successfully"
+        )
     );
 });

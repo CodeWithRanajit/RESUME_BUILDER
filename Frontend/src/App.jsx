@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
 import Layout from "./Pages/Layout";
 import Dashboard from "./Pages/Dashboard";
 import ResumeBuilder from "./Pages/ResumeBuilder";
@@ -9,10 +8,11 @@ import Signup from "./pages/SignUp";
 import Login from "./pages/Login";
 import Home from "./Pages/Home";
 import NotFound from "./pages/NotFound";
+import GoogleAuthCallback from "./pages/GoogleCallback";
 const App = () => {
   return (
     <>
-    <Toaster/>
+
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="*" element={<NotFound/>}/>
@@ -24,6 +24,7 @@ const App = () => {
       <Route path="/pricing" element={<Pricing/>}/>
       <Route path="/login" element={<Login/>} />
       <Route path="/signup" element={<Signup/>}/>
+      <Route path="/auth/google/callback" element={<GoogleAuthCallback/>}/>
     </Routes>
     </>
   )
