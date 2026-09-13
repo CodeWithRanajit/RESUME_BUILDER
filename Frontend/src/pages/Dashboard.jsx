@@ -28,7 +28,6 @@ const Dashboard = () => {
   const createResume = async (e) => {
     e.preventDefault();
     setShowCreateResume(false);
-    // ✅ Better ID generation
     navigate(`/app/builder/resume-${Date.now()}`);
     setTitle(""); // Reset title
   };

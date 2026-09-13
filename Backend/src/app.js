@@ -3,7 +3,7 @@ import cors from "cors";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
-import apiLimit from "./middlewares/rateLimiter.js";
+import apiLimit from "./middlewares/rateLimiter.middlewares.js";
 
 
 const app = express();
@@ -14,7 +14,7 @@ app.use(helmet());
 
 // using cors
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: process.env.FRONTEND_URL || `http://localhost:5173`,
     credentials: true
 }));
 
@@ -49,7 +49,7 @@ app.get("/", (req, res) => {
 
 // import all routes
 import healthcheckRouter from "./routes/healthcheck.routes.js";
-import errorHandler from "./middlewares/errorHandler.js";
+import errorHandler from "./middlewares/errorHandler.middlewares.js";
 import userRouter from "./routes/user.routes.js";
 
 // route declearation
