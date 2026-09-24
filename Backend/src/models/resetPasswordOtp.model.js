@@ -30,7 +30,7 @@ const passwordResetOtpSchema = new Schema({
 passwordResetOtpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 // generate otp
-passwordResetOtpSchema.static.generateOtpForResetPassword = function () {
+passwordResetOtpSchema.statics.generateOtpForResetPassword = function () {
     return Math.floor(100000 + Math.random() * 999999).toString();
 };
 
