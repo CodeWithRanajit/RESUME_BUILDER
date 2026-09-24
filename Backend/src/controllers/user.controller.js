@@ -1,7 +1,7 @@
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { emailRegex, passwordRegex } from "../utils/validation.js";
+import { emailRegex } from "../utils/validation.js";
 import { User } from "../models/user.model.js";
 import { capitalizeName } from "../utils/capitalizeName.js";
 import { emailVerificationModel } from "../models/emailVerificationOtp.model.js";
@@ -10,6 +10,11 @@ import sendEmail from "../utils/mailer.js";
 import generateAccessTokenAndRefreshToken from "../utils/generateToken.js";
 import getGoogleClient from "../utils/getGoogleClient.js";
 import { OAuthAccount } from "../models/oAuth.model.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import passwordResetModel from "../models/resetPasswordOtp.model.js";
+import { resetPasswordTemplate } from "../utils/resetPasswordHtmlFilePath.js";
+
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, confirmPassword } = req.body;
@@ -18,11 +23,16 @@ export const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All fields are required");
   }
 
+  if (!/^[A-Za-z\s]+$/.test(name)) {
+    throw new ApiError(400, "Name can contain only letters and spaces");
+}
+
   const cleanName = name?.trim();
 
   if (cleanName.length < 3 || cleanName.length > 60) {
     throw new ApiError(400, "Name must be between 3 and 60 characters");
   }
+
   const cleanEmail = email?.trim().toLowerCase();
 
   if (!emailRegex.test(cleanEmail)) {
@@ -229,7 +239,7 @@ export const resendVerifyEmailOtp = asyncHandler(async (req, res) => {
     const createdUserFirstName = capitalizeName(user.name);
     const otpForEmailVerifiaction =
       await emailVerificationModel.generateOtpForEmailVerification();
-    const htmlemialTemplateForVerifyEmail = emailTemplateForEmailVerification
+      const htmlemialTemplateForVerifyEmail = emailTemplateForEmailVerification
       .replace("{{name}}", createdUserFirstName)
       .replace("{{otp}}", otpForEmailVerifiaction);
 
@@ -405,6 +415,7 @@ export const googleAuthCallbackHandler = asyncHandler(async (req, res) => {
   
 });
 export const refreshAccessToken = asyncHandler(async (req, res) => {
+  
   const incomingRefreshToken = req.cookies.refreshToken;
 
   if (!incomingRefreshToken) {
@@ -416,24 +427,19 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
       incomingRefreshToken,
       process.env.REFRESH_TOKEN_SECRET
     );
-
+    
     const user = await User.findById(decodedToken?._id);
 
     if (!user) {
       throw new ApiError(401, "Invalid refresh token");
     }
 
-    if (incomingRefreshToken !== user.refreshToken) {
-      throw new ApiError(
-        401,
-        "Refresh token is expired or used"
-      );
+    const isValidRefreshToken= await bcrypt.compare(incomingRefreshToken,user.refreshToken);
+    if(!isValidRefreshToken){
+      throw new ApiError(401, "Invalid refresh token")
     }
-
-    const {
-      accessToken,
-      newRefreshToken
-    } = await generateAccessTokenAndRefreshToken(user._id);
+    const accessToken = user.generateAccessToken();
+   
 
     const accessTokenOptions = {
       httpOnly: true,
@@ -442,24 +448,12 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
       maxAge: 15 * 60 * 1000
     };
 
-    const refreshTokenOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    };
-
     return res
       .status(200)
       .cookie(
         "accessToken",
         accessToken,
         accessTokenOptions
-      )
-      .cookie(
-        "refreshToken",
-        newRefreshToken,
-        refreshTokenOptions
       )
       .json(
         new ApiResponse(
@@ -470,9 +464,20 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
       );
 
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
+    if (error.name === "TokenExpiredError") {
+      throw new ApiError(
+        401,
+        "Session expired. Please login again."
+      );
+    }
+
     throw new ApiError(
       401,
-      error?.message || "Invalid refresh token"
+      "Invalid refresh token"
     );
   }
 });
@@ -519,3 +524,117 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
         )
     );
 });
+export const verifyEmailOtp = asyncHandler(async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    throw new ApiError(400, "Email and OTP are required");
+  }
+
+  // Find OTP record
+  const otpRecord = await emailVerificationModel.findOne({
+    email
+  });
+
+  if (!otpRecord) {
+    throw new ApiError(400, "OTP not found or already used");
+  }
+
+  // 1. Check OTP expiry
+  if (otpRecord.isEmailVerificationOtpExpired()) {
+    await emailVerificationModel.deleteOne({
+      _id: otpRecord._id,
+    });
+
+    throw new ApiError(400, "OTP has expired");
+  }
+
+  // 2. Compare entered OTP with hashed OTP
+  const isCorrect = await otpRecord.isEmailVerifyOtpCorrect(otp);
+
+  if (!isCorrect) {
+    throw new ApiError(400, "Invalid OTP");
+  }
+
+  // 3. Find user
+
+  const user = await User.findById(otpRecord.userId);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  // 4. Mark email as verified
+  user.isEmailVerified = true;
+  user.emailVerifiedAt = new Date();
+
+  await user.save();
+
+  // 5. Delete OTP so it cannot be reused
+  await emailVerificationModel.deleteOne({
+    _id: otpRecord._id,
+  });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        null,
+        "Email verified successfully"
+      )
+    );
+});
+export const forgotPasswordOtp = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    // Check email
+    if (!email) {
+        throw new ApiError(400, "Email is required");
+    }
+
+    // Find user
+    const user = await User.findOne({email});
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    // Generate OTP
+    
+    const createdUserFirstName = capitalizeName(user.name);
+    const otpForResetPassword = passwordResetModel.generateOtpForResetPassword();
+      const htmlEmailTemplateForResetPassword = resetPasswordTemplate
+      .replace("{{name}}", createdUserFirstName)
+      .replace("{{otp}}", otpForResetPassword);
+
+      await sendEmail(
+      user.email,
+      "Reset Your Password — ResumeCraft",
+      htmlEmailTemplateForResetPassword,
+    );
+
+    const resetPasswordOtpModel = await passwordResetModel.findOne({
+      userId: user._id,
+    });
+
+    if (!resetPasswordOtpModel) {
+      await passwordResetModel.create({
+        userId: user._id,
+        email: user.email,
+        otp: otpForResetPassword,
+      });
+    } else {
+      resetPasswordOtpModel.otp = otpForResetPassword;
+      await resetPasswordOtpModel.save();
+    }
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            null,
+            "Password reset OTP sent successfully"
+        )
+    );
+});
+
