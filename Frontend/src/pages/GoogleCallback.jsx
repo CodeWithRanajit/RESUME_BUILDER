@@ -31,7 +31,7 @@ const GoogleAuthCallback = () => {
 
         const handleGoogleCallback = async () => {
             const status = searchParams.get("status");
-
+            
             if (status !== "success") {
                 toast.error(
                     "Google login failed. Please try again."

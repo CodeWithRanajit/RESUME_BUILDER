@@ -11,28 +11,49 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const navigate=useNavigate();
 
-    const getCurrentUser = async () => {
-      
-        try {
-            const response = await axios.get(
-                "http://localhost:8000/api/v1/auth/users/current-user",
-                {
-                    withCredentials: true,
-                }
-            );
-            const currentUser=response.data.data.user;
-            setUser(currentUser);
-            setIsLoggedIn(true);
-            return currentUser;
+   const getCurrentUser = async () => {
+try {
+const response = await axios.get(
+"http://localhost:8000/api/v1/auth/users/get-user",
+{ withCredentials: true }
+); 
+    const currentUser = response.data.data.user;
+    setUser(currentUser); 
+    setIsLoggedIn(true);
 
-        } catch (error) {
+    return currentUser;
+
+} catch (error) {
+
+    if (error.response?.data?.message === "Access token expired") {
+        try {
+            // Generate a new access token
+            await axios.post(
+                "http://localhost:8000/api/v1/auth/users/refresh-token",
+                {},
+                { withCredentials: true }
+            );
+            // Retry get-user
+            return await getCurrentUser();
+
+        } catch (refreshError) {
             setUser(null);
             setIsLoggedIn(false);
-            throw error;
-        } finally {
-            setLoading(false);
+            throw refreshError;
         }
-    };
+    }
+
+    setUser(null);
+    setIsLoggedIn(false);
+    throw error;
+
+} finally {
+    setLoading(false);
+}
+
+
+};
+
 const logOutUser = async () => {
     try {
         await axios.post(
