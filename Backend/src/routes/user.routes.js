@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { forgotPasswordOtp, getCurrentUser, googleAuthCallbackHandler, googleAuthStartHandler, login, logoutUser, refreshAccessToken, registerUser, resendVerifyEmailOtp, verifyEmailOtp } from "../controllers/user.controller.js";
+import { forgotPasswordOtp, getCurrentUser, googleAuthCallbackHandler, googleAuthStartHandler, login, logoutUser, refreshAccessToken, registerUser, resendVerifyEmailOtp, resetPassword, verifyEmailOtp, verifyForgatePasswordOtp } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middlewares.js";
 
 const router = Router();
@@ -14,4 +14,6 @@ router.post("/refresh-token",refreshAccessToken);
 router.post("/logout",verifyJWT,logoutUser);
 router.post("/verify-email",verifyEmailOtp);
 router.post("/reset-password-otp",forgotPasswordOtp);
+router.post("/verify-reset-password-otp",verifyForgatePasswordOtp);
+router.post("/reset-password",resetPassword);
 export default router;

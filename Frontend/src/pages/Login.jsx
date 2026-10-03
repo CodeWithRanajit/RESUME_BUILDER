@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 
 const Login = () => {
   const handleGoogleLogin=()=>{
-    toast.loading("Redirecting to Google...");
+    // toast.loading("Redirecting to Google...");
     setTimeout(()=>{
         window.location.href="http://localhost:8000/api/v1/auth/users/google";
     },500);
